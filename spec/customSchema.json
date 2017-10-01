@@ -1,0 +1,28 @@
+{
+  "properties": {
+    "aaa": {
+      "enum": [
+        "aaa", 
+        "bbb"
+      ]
+    },
+    "eee": {
+      "items": {
+        "enum": ["F", "J", "Y"]
+      },
+      "uniqueItems": true
+    }, 
+    "iii": {
+      "items": {
+        "properties": {
+          "name": {
+            "enum": ["a", "b", "c"]
+          }
+        }
+      }, 
+      "maxItems": 3,
+      "minItems": 2,
+      "uniqueItems": true
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#", 
+  "definitions": {}, 
+  "additionalProperties": false,
+  "properties": {
+    "aaa": {
+      "enum": [
+        "aaa", 
+        "bbb"
+      ],
+      "type": "string"
+    },
+    "bbb": {
+      "type": "string"
+    }, 
+    "ccc": {
+      "type": "integer"
+    }, 
+    "ddd": {
+      "type": "integer"
+    }, 
+    "eee": {
+      "items": {
+        "type": "string",
+        "enum": ["F", "J", "Y"]
+      },
+      "type": "array",
+      "uniqueItems": true
+    }, 
+    "fff": {
+      "items": {
+        "type": "integer"
+      }, 
+      "type": "array"
+    }, 
+    "ggg": {
+      "items": {
+        "type": "string"
+      }, 
+      "type": "array"
+    }, 
+    "hhh": {
+      "items": {
+        "type": "integer"
+      }, 
+      "type": "array"
+    }, 
+    "iii": {
+      "additionalItems": false, 
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["a", "b", "c"]
+          }, 
+          "x": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "x"
+        ],
+        "type": "object"
+      }, 
+      "maxItems": 3,
+      "minItems": 2,
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "iii"
+  ], 
+  "type": "object"
+}

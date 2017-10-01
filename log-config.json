@@ -1,0 +1,12 @@
+{
+  "appenders": [
+    {
+      "type":     "file",
+      "category": "access",
+      "maxLogSize": 1048576,
+      "filename": "access.log"
+    },
+    { "type": "console" }
+  ],
+  "levels": {"access": "INFO"}
+}

@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "aaa": {
+      "type": "string",
+      "enum": [
+        "aaa",
+        "bbb"
+      ]
+    },
+    "bbb": {
+      "type": "string"
+    },
+    "ccc": {
+      "type": "number"
+    },
+    "ddd": {
+      "type": "number"
+    },
+    "eee": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "F",
+          "J",
+          "Y"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "fff": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "ggg": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hhh": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "iii": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "a",
+              "b",
+              "c"
+            ]
+          },
+          "val1": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "val1"
+        ],
+        "additionalProperties": false
+      },
+      "maxItems": 3,
+      "minItems": 2,
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "aaa",
+    "bbb",
+    "ccc",
+    "ddd",
+    "eee",
+    "fff",
+    "ggg",
+    "hhh",
+    "iii"
+  ]
+}

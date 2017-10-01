@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - MyUtils.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>MyUtils.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">88.90</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">211</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">54.44</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">2.87</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">&quot;use strict&quot;;
+Object.defineProperty(exports, &quot;__esModule&quot;, { value: true });
+/**
+ * Generic Functions
+ */
+exports.intArray = max =&gt; [...Array(max)].map((_, i) =&gt; i + 1);
+exports.lpad = (source, digits, c = &quot;0&quot;) =&gt; {
+    return (exports.intArray(digits).reduce((acc) =&gt; acc + c, &quot;&quot;) + source).substr(-digits);
+};
+exports.logger = (fs, fileName) =&gt; {
+    const fd = fs.openSync(fileName, &quot;w&quot;);
+    const eol = require(&quot;os&quot;).EOL;
+    const log = (logType) =&gt; {
+        return (arg, ...args) =&gt; {
+            const now = new Date();
+            const msg = `[${now.toLocaleString()}.${exports.lpad(now.getMilliseconds(), 3)}] `
+                + `[${logType}] ${JSON.stringify(arg)}${args.map(arg2 =&gt; &quot;, &quot; + arg2).join(&quot;&quot;)}`;
+            console.log(msg);
+            fs.writeSync(fd, msg + eol);
+            return arg;
+        };
+    };
+    process.on(&quot;exit&quot;, _ =&gt; fs.closeSync(fd));
+    return {
+        debug: log(&quot;TRACE&quot;),
+        error: log(&quot;ERROR&quot;),
+        info: log(&quot;INFO&quot;),
+        warn: log(&quot;WARN&quot;),
+    };
+};
+exports.findPathsNode = (node, comparator, path = []) =&gt; {
+    if (typeof node === &quot;object&quot; &amp;&amp; !Array.isArray(node)) {
+        return Object.keys(node).reduce((memo, key) =&gt; {
+            const currentPath = path.concat([key]);
+            return memo.concat(comparator(key) ? [currentPath] : [], exports.findPathsNode(node[key], comparator, currentPath));
+        }, []);
+    }
+    else {
+        return [];
+    }
+};
+exports.getNodeJson = (json, paths) =&gt; {
+    if (paths.length === 0) {
+        return json;
+    }
+    return exports.getNodeJson(json[paths[0]], paths.slice(1));
+};
+exports.copyJson = (obj) =&gt; JSON.parse(JSON.stringify(obj));
+exports.setNodeJson = (paths, value) =&gt; {
+    return (json) =&gt; {
+        const getOrCreateNodeJson = (node, paths2) =&gt; {
+            if (paths2.length === 0) {
+                return node;
+            }
+            if (node[paths2[0]] === undefined) {
+                node[paths2[0]] = {};
+            }
+            return getOrCreateNodeJson(node[paths2[0]], paths2.slice(1));
+        };
+        const clone = exports.copyJson(json);
+        const parentPath = paths.slice(0, -1);
+        const target = paths.slice(-1)[0];
+        getOrCreateNodeJson(clone, parentPath)[target] = value;
+        return clone;
+    };
+};
+/**
+ * Array&#039;s generic callbacks
+ */
+// Unique for filter
+exports.uniq = (value, i, self) =&gt; self.indexOf(value) === i;
+// Flatten for reduce
+exports.flatten = (memo, listable) =&gt; {
+    return [].concat(memo, Array.isArray(listable) ?
+        listable.reduce((memo2, listable2) =&gt; exports.flatten(memo2, listable2)) :
+        listable);
+};
+exports.flat2to1 = (memo, listable) =&gt; {
+    return [].concat((memo || []), ...(Array.isArray(listable) ? listable : [listable]));
+};
+exports.match = (...matchers) =&gt; {
+    const isMatch = (comparator, value) =&gt; {
+        if (comparator == null) {
+            return true;
+        }
+        else if (comparator.constructor.name === &quot;RegExp&quot; || comparator instanceof RegExp) {
+            return comparator.test(value);
+        }
+        return comparator === value;
+    };
+    return (value) =&gt; {
+        const [, f] = matchers.find(([comparator]) =&gt; isMatch(comparator, value));
+        // const [, f] = matched || [, null];
+        return f(value);
+    };
+};
+/**
+ * Function Combinaters
+ */
+exports.pipe = (fn, ...fns) =&gt; (a) =&gt; fns.reduce((memo, fn2) =&gt; fn2(memo), fn(a));
+exports.compose = (...fns) =&gt; exports.pipe(fns.pop(), fns.reverse());
+exports.identity = (a) =&gt; a;
+exports.tap = (f) =&gt; (a) =&gt; {
+    f(a);
+    return a;
+};
+exports.alt = (...fns) =&gt; (a) =&gt; {
+    if (!fns[0]) {
+        return null;
+    }
+    // case !0 &amp;&amp; !&#039;&#039; &amp;&amp; !false &amp;&amp; !null &amp;&amp; !undefined
+    return fns[0](a) || exports.alt(...fns.slice(1))(a);
+    // case !false &amp;&amp; !null &amp;&amp; !undefined
+    // const ret = fns[0](a);
+    // return (ret !== false &amp;&amp; ret !==null &amp;&amp; ret !== undefined) ? ret : alt(...fns.slice(1))(a);
+};
+exports.fork = (join, f1, f2) =&gt; (a) =&gt; join(f1(a), f2(a));
+exports.seq = (fn, ...fns) =&gt; (a) =&gt; {
+    [fn].concat(...fns).forEach(f =&gt; f(a));
+    return a;
+};
+/**
+ * Maybe monad
+ */
+class Maybe {
+    get isNothing() {
+        return false;
+    }
+    get isJust() {
+        return false;
+    }
+}
+Maybe.just = (a) =&gt; new Just(a);
+Maybe.nothing = () =&gt; new Nothing();
+Maybe.fromNullable = (a) =&gt; a !== null ? Maybe.just(a) : Maybe.nothing();
+Maybe.of = (a) =&gt; Maybe.just(a);
+exports.Maybe = Maybe;
+class Just extends Maybe {
+    constructor(valueIn) {
+        super();
+        this.valueIn = valueIn;
+        this.map = (f) =&gt; Maybe.fromNullable(f(this.value));
+        this.getOrElse = (_) =&gt; this.value;
+        this.filter = (f) =&gt; Maybe.fromNullable(f(this.value) ? this.value : null);
+        this.chain = (f) =&gt; f(this.value);
+    }
+    get value() {
+        return this.valueIn;
+    }
+}
+class Nothing extends Maybe {
+    constructor() {
+        super(...arguments);
+        this.map = (_) =&gt; this;
+        this.getOrElse = (other) =&gt; other;
+        this.filter = (_) =&gt; this;
+        this.chain = (_) =&gt; this;
+    }
+    get value() {
+        throw new TypeError(`Can&#039;t extract the value of a Nothing.`);
+    }
+}
+exports.lift = (f) =&gt; (value) =&gt; Maybe.fromNullable(value).map(f);
+exports.map = (f) =&gt; (container) =&gt; container.map(f);
+exports.chain = (f) =&gt; (container) =&gt; container.chain(f);
+exports.filter = (f) =&gt; (container) =&gt; container.filter(f);
+/**
+ * Either monad
+ */
+class Either {
+    constructor(valueIn) {
+        this.valueIn = valueIn;
+    }
+    get value() {
+        return this.valueIn;
+    }
+}
+Either.left = (a) =&gt; new Left(a);
+Either.right = (a) =&gt; new Right(a);
+Either.fromNullable = (val) =&gt; (val !== null &amp;&amp; val !== undefined) ? Either.right(val) : Either.left(val);
+Either.of = (a) =&gt; Either.right(a);
+exports.Either = Either;
+class Right extends Either {
+    constructor() {
+        super(...arguments);
+        this.map = (f) =&gt; Either.of(f(this.value));
+        this.getOrElse = (_) =&gt; this.value;
+        this.orElse = (_) =&gt; this;
+        this.chain = (f) =&gt; f(this.value);
+        this.getOrElseThrow = (a) =&gt; this.value;
+        this.filter = (f) =&gt; Either.fromNullable(f(this.value) ? this.value : null);
+    }
+    get value() {
+        return this.value;
+    }
+}
+class Left extends Either {
+    constructor() {
+        super(...arguments);
+        this.map = (_) =&gt; this;
+        this.getOrElse = (other) =&gt; other;
+        this.orElse = (f) =&gt; f(this.value);
+        this.chain = (f) =&gt; this;
+        this.getOrElseThrow = (a) =&gt; { throw new Error(a); };
+        this.filter = (f) =&gt; this;
+    }
+    get value() {
+        throw new TypeError(`Can&#039;t extract the value of a Left(a).`);
+    }
+}
+//# sourceMappingURL=C:/dev/node/test/MyUtils.js.map</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
