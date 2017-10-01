@@ -50,7 +50,7 @@ const modifiedSchema = pathsTypeObject.reduce((memo, path) => {
   return setNodeJson(
     [[...pathInit, 'additionalProperties'], false],
     [[...pathInit, 'required'], required],
-  )(memo2);
+  )(memo);
 }, baseSchema);
 
 const customSchema = JSON.parse(fs.readFileSync('./spec/customSchema.json', 'utf8'));

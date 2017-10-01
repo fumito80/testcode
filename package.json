@@ -23,9 +23,12 @@
     "chai": "^4.1.0",
     "gulp": "^3.9.1",
     "gulp-cli": "^1.4.0",
+    "gulp-notify": "^3.0.0",
+    "gulp-plumber": "^1.1.0",
     "gulp-typescript": "^3.2.2",
     "jest": "^21.0.1",
     "mocha": "^3.4.2",
+    "node-notifier": "^5.1.2",
     "plato": "^1.7.0",
     "power-assert": "^1.4.4",
     "ts-jest": "^21.0.1",
@@ -44,7 +47,8 @@
     "tsc": "tsc -w",
     "start": "node test.js",
     "plato": "plato -d report *.js",
-    "gulp": "gulp"
+    "gulp": "gulp",
+    "gulp:w": "gulp watch"
   },
   "keywords": [],
   "author": "",

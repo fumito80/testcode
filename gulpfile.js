@@ -3,30 +3,48 @@ const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const child = require('child_process');
 
-let taskFlag = false;
+function getNotifier() {
+  if (process.platform === 'win32') {
+    const WindowsBalloon = require('node-notifier').WindowsBalloon;
+    return new WindowsBalloon({
+      withFallback: false, // Try Windows Toast and Growl first? 
+      customPath: void 0 // Relative/Absolute path if you want to use your fork of notifu 
+    });
+  }
+  return require('node-notifier');
+}
 
-gulp.task('default', function () {
-  taskFlag = true;
+const notifier = getNotifier();
+
+gulp.task('tsc:w', function () {
+  let error = false;
   const tsProject = ts.createProject("./tsconfig.json");
-  return tsProject.src()
+  return tsProject
+    .src()
     .pipe(tsProject())
     .on('error', (err) => {
-      const title = `"${err.name}"`;
-      const msg = `"${err.message.replace(/\u001b\[\d+m?/g, '')}"`;
-      child.execFileSync('powershell', ['./build.ps1', '0', title, msg, 'Error']);
-      process.exit(1);
+      error = true;
+      const message = err.message.replace(/\u001b\[\d+m?/g, '');
+      notifier.notify({
+        type: 'error',
+        title: err.name,
+        message
+      });
     })
-    .pipe(gulp.dest('./dist'));
-  // return result;
+    .pipe(gulp.dest('./dist'))
+    .on('finish', () => {
+      if (!error) {
+        notifier.notify({
+          type: 'info',
+          title: "Done!",
+          message: "TypeScript compile"
+        });
+      }
+    });
 });
 
-process.on('exit', exitCode => {
-  if (taskFlag && exitCode === 0) {
-    const title = '"Done!"';
-    const msg = '"TypeScript compile"';
-    child.execFileSync('powershell', ['./build.ps1', '20000', title, msg]);
-  }
-  process.nextTick(() => {
-    process.exit(exitCode);
-  });
+gulp.task('watch', () => {
+  gulp.watch('./src/*.ts', ['tsc:w']);
 });
+
+gulp.task('default', ['tsc']);
